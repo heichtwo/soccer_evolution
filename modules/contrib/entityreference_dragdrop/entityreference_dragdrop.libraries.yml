@@ -1,0 +1,13 @@
+init:
+  version: VERSION
+  js:
+    js/entityreference_dragdrop.js: {}
+  css:
+    component:
+      css/entityreference_dragdrop.css: {}
+  dependencies:
+    - core/sortable
+    - core/drupal
+    - core/drupalSettings
+    - core/jquery
+    - core/once
