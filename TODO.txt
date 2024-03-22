@@ -1,4 +1,7 @@
 
+
+./backup.sh calcio_dev
+
 - add filter condition chose id value "si", "no" to view 'test giocatori'
 
 
