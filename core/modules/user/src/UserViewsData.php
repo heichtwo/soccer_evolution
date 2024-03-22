@@ -39,7 +39,7 @@ class UserViewsData extends EntityViewsData {
       'label' => $this->t('nodes'),
     ];
     $data['users_field_data']['uid']['relationship'] = [
-      'title' => $this->t('Vince'),
+      'title' => $this->t('User poll vote'),
       'help' => $this->t('Relate user to poll vote.'),
       'id' => 'standard',
       'base' => 'poll_vote',
