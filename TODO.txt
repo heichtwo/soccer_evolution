@@ -1,0 +1,4 @@
+
+- add filter condition chose id value "si", "no" to view 'test giocatori'
+
+
