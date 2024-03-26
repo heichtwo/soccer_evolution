@@ -1,0 +1,58 @@
+{#
+/**
+ * @file
+ * Default theme implementation for a meter.
+ *
+ * Available variables:
+ * - display_value: The textual representation of the meter bar.
+ * - form: One or more forms to which the <meter> element belongs; multiple
+ *   forms separated by spaces.
+ * - high: A number specifying the range that is considered to be a high value.
+ * - low: A number specifying the range that is considered to be a low value.
+ * - max: A number specifying the maximum value of the range.
+ * - min: A number specifying the minimum value of the range.
+ * - optimum: A number specifying what value is the optimal value for the gauge.
+ * - value: A number specifying the current value of the gauge.
+ * - percentage: A number specifying the current percentage of the gauge.
+ * - attributes: HTML attributes for the containing element.
+ * - choice: The choice of a poll.
+ * - is_current_selection: TRUE if the current choice is the user vote.
+ *
+ * @see template_preprocess()
+ * @see template_preprocess_region()
+ *
+ * @ingroup themeable
+ */
+#}
+{% set is_current_selection_class = is_current_selection ? 'is-current-selection' : 'not-current-selection' %}
+
+{% if list_users %}
+ <dt class="choice-title {{ is_current_selection_class }}">
+  <details>
+    <summary class="clickable">{{ choice }}</summary>
+      <p>
+        {% if display_value %}
+          <div class="">
+            {% for user in list_users %}
+              <li>
+              <a href="../user/{{ user[0] }}" class="breadcrumb__link">{{ user[1] }}</a>
+              </li>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </p>
+  </details>
+</dt>
+{% else %}
+  <dt class="choice-title {{ is_current_selection_class }}">{{ choice }}</dt>
+{% endif %}
+
+<dd class="choice-result {{ is_current_selection_class }}">
+  <div{{ attributes }}>
+    <div style="width: {{ percentage }}%" class="foreground"></div>
+  </div>
+
+  {% if display_value %}
+    <div class="percent">{{ display_value }}</div>
+  {% endif %}
+</dd>

@@ -1,0 +1,150 @@
+<?php
+
+/**
+ * @file
+ * Install, update, and uninstall functions for the Poll module.
+ */
+
+use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\poll\Entity\PollChoice;
+
+/**
+ * Implements hook_schema().
+ */
+function poll_schema() {
+  $schema['poll_vote'] = [
+    'description' => 'Stores per-{users} votes for each {poll}.',
+    'fields' => [
+      'chid' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => "The {users}'s vote for this poll.",
+      ],
+      'pid' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'The {poll} entity this vote is for.',
+      ],
+      'uid' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'The {users}.uid this vote is from unless the voter was anonymous.',
+      ],
+      'hostname' => [
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'The IP address this vote is from unless the voter was logged in.',
+      ],
+      'timestamp' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'The timestamp of the vote creation.',
+      ],
+    ],
+    'primary key' => ['pid', 'uid', 'hostname'],
+    'foreign keys' => [
+      'poll_entity' => [
+        'table' => 'poll',
+        'columns' => ['pid' => 'pid'],
+      ],
+      'voter' => [
+        'table' => 'users',
+        'columns' => ['uid' => 'uid'],
+      ],
+    ],
+    'indexes' => [
+      'chid' => ['chid'],
+      'hostname' => ['hostname'],
+      'uid' => ['uid'],
+    ],
+  ];
+
+  return $schema;
+}
+
+/**
+ * Convert choices to a separate entity type.
+ */
+function poll_update_8001() {
+  // Create the entity type.
+  \Drupal::entityTypeManager()->clearCachedDefinitions();
+  // Don't update if the entity type already exists.
+  if (\Drupal::entityDefinitionUpdateManager()->getEntityType('poll_choice')) {
+    return;
+  }
+  $poll_choice = \Drupal::entityTypeManager()->getDefinition('poll_choice');
+  \Drupal::entityDefinitionUpdateManager()->installEntityType($poll_choice);
+
+  // Migrate the data to the new entity type.
+  $result = \Drupal::database()->query('SELECT * FROM {poll__choice}');
+  foreach ($result as $row) {
+    $choice = PollChoice::create([
+      'langcode' => $row->langcode,
+      'id' => $row->choice_chid,
+      'choice' => $row->choice_choice,
+    ]);
+    $choice->enforceIsNew(TRUE);
+
+    $choice->setChoice($row->choice_choice);
+    $choice->save();
+  }
+
+  $target_id_schema = [
+    'description' => 'The ID of the target entity.',
+    'type' => 'int',
+    'unsigned' => TRUE,
+    'not null' => TRUE,
+  ];
+
+  // Convert the choice reference table.
+  $schema = \Drupal::database()->schema();
+  $schema->dropField('poll__choice', 'choice_choice');
+  $schema->dropField('poll__choice', 'choice_vote');
+  $schema->changeField('poll__choice', 'choice_chid', 'choice_target_id', $target_id_schema);
+  $schema->addIndex('poll__choice', 'choice_target_id', ['choice_target_id'], ['fields' => ['choice_target_id' => $target_id_schema]]);
+
+  // Update the field storage repository.
+  \Drupal::service('entity_field.manager')->clearCachedFieldDefinitions();
+  $storage_definition = \Drupal::service('entity_field.manager')->getFieldStorageDefinitions('poll')['choice'];
+  \Drupal::service('entity.last_installed_schema.repository')->setLastInstalledFieldStorageDefinition($storage_definition);
+
+  // Update the stored field schema.
+  // @todo There has to be a better way to do this.
+  $field_schema = \Drupal::keyValue('entity.storage_schema.sql')->get('poll.field_schema_data.choice');
+  unset($field_schema['poll__choice']['fields']['choice_chid']);
+  unset($field_schema['poll__choice']['fields']['choice_choice']);
+  unset($field_schema['poll__choice']['fields']['choice_vote']);
+  unset($field_schema['poll__choice']['indexes']['choice_chid']);
+  $field_schema['poll__choice']['fields']['choice_target_id'] = $target_id_schema;
+  $field_schema['poll__choice']['indexes']['choice_target_id'] = ['choice_target_id'];
+  \Drupal::keyValue('entity.storage_schema.sql')->set('poll.field_schema_data.choice', $field_schema);
+}
+
+/**
+ * Update poll entity with new auto_submit option.
+ */
+function poll_update_8002() {
+  $field_storage_definition = BaseFieldDefinition::create('boolean')
+    ->setLabel(t('Auto submit voting form'))
+    ->setDescription(t('If enabled the voting form will submit as soon as a choice is selected.'))
+    ->setDefaultValue(0)
+    ->setDisplayOptions('form', [
+      'type' => 'boolean_checkbox',
+      'settings' => [
+        'display_label' => TRUE,
+      ],
+      'weight' => 3,
+    ])
+    ->setDisplayConfigurable('form', TRUE)
+    ->setInitialValue(0);
+
+  \Drupal::entityDefinitionUpdateManager()
+    ->installFieldStorageDefinition('auto_submit', 'poll', 'poll', $field_storage_definition);
+}
