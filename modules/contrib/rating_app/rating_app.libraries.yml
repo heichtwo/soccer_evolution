@@ -1,0 +1,60 @@
+# Custom module library for general purposes.
+rating_app:
+  js:
+    js/rating-app.js: {}
+  css:
+    component:
+      css/rating-app.css: {}
+  dependencies:
+    - core/drupalSettings
+
+reviews_resume:
+  js:
+    ratingReviews/ratingReviews.umd.js: { attributes: { type: 'text/javascript'} }
+  css:
+    component:
+      ratingReviews/style.css: {}
+  dependencies:
+    - rating_app/vuejs_dev
+    - core/drupalSettings
+    
+reviews_start:
+  js:
+    StarsApp/ratingStars.umd.js: { attributes: { type: 'text/javascript'} }
+  css:
+    component:
+      StarsApp/style.css: {}
+  dependencies:
+    - rating_app/vuejs_dev
+    - core/drupalSettings
+
+# Third-party library (CDN).
+vuejs_dev:
+  remote: https://vuejs.org
+  version: 3.3.4
+  license:
+    name: MIT
+    url: https://github.com/vuejs/vue/blob/dev/LICENSE
+    gpl-compatible: true
+  js:
+    https://unpkg.com/vue@3/dist/vue.global.js: { type: external, minified: true }
+
+vuejs:
+  remote: https://vuejs.org
+  version: 3.3.4
+  license:
+    name: MIT
+    url: https://github.com/vuejs/vue/blob/dev/LICENSE
+    gpl-compatible: true
+  js:
+    https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.4/vue.global.prod.min.js: { type: external, minified: true }
+    
+rating_app_reviews_resume:
+  css:
+    component:
+      css/rating-app-reviews-resume-widget.css: {}
+
+rating_app_entity_start:
+  css:
+    component:
+      css/rating-app-entity-start-widget.css: {}

@@ -1,0 +1,40 @@
+rating_app.get_reviews:
+  path: "/rating-app/get-reviews/{entity_type_id}/{entity_id}/{field_name}"
+  defaults:
+    _title: "Get reviews"
+    _controller: '\Drupal\rating_app\Controller\RatingAppController::getReviews'
+  requirements:
+    _permission: "access content"
+
+rating_app.get_start:
+  path: "/rating-app/get-start/{entity_type_id}/{entity_id}/{field_name}"
+  defaults:
+    _title: "Get reviews"
+    _controller: '\Drupal\rating_app\Controller\RatingAppController::getStart'
+  requirements:
+    _permission: "access content"
+    
+rating_app.like_dislike:
+  path: "/rating-app/review/like-dislike/{entity_type_id}/{entity_id}"
+  defaults:
+    _title: "Like or dislike"
+    _controller: '\Drupal\rating_app\Controller\RatingAppController::LikeDislikeReview'
+  requirements:
+    _permission: "access content"
+
+rating_app.settings_form:
+  path: "/admin/config/system/rating-app"
+  defaults:
+    _title: "rating_app settings"
+    _form: 'Drupal\rating_app\Form\SettingsForm'
+  requirements:
+    _permission: "administer rating_app configuration"
+
+rating_app.add_comment:
+  path: "/rating-app/review/save-comment/{entity_type_id}/{entity_id}"
+  defaults:
+    _title: "Like or dislike"
+    _controller: '\Drupal\rating_app\Controller\RatingAppController::SaveReview'
+  requirements:
+    _permission: "access content"
+ 

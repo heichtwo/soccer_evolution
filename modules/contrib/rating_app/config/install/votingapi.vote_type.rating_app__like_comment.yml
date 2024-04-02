@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: rating_app__like_comment
+label: 'Rating app Like comment'
+value_type: points
+description: ''

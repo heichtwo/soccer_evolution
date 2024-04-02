@@ -1,0 +1,17 @@
+{
+  "name": "habeuk/rating_app",
+  "description": "review and vote",
+  "type": "drupal-module",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "kouwa stephane",
+      "email": "kksasteph888@gmail.com"
+    }
+  ],
+  "require": {
+  	"drupal/votingapi": "^3.0@beta",
+  	"habeuk/drupal_utility": "^1.0",
+  	"habeuk/debug": "^2.0"
+  }
+}
