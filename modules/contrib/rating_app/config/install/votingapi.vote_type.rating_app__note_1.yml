@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: rating_app__note_1
+label: 'Rating app note 1'
+value_type: points
+description: ''
