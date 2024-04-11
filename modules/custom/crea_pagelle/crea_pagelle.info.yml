@@ -1,0 +1,5 @@
+name: Crea Pagelle
+description: Custom module to create pagelle programatically.
+core_version_requirement: ^8.8 || ^9 || ^10
+type: module
+package: custom

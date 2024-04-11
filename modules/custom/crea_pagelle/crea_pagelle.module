@@ -1,0 +1,39 @@
+<?php
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\node\NodeTypeInterface;
+use Drupal\node\Entity\Node;
+
+function crea_pagelle_node_presave(EntityInterface $entity) {
+
+  $entity_type = 'node';
+  $bundles = ['product'];
+
+  $fld_price = 'field_price';
+  if ($entity->getEntityTypeId() != $entity_type || !in_array($entity->bundle(), $bundles)) {
+    return;
+  }
+ // $entity->{$fld_price}->setValue(10.75);
+
+}
+
+function crea_pagelle_entity_update(EntityInterface $entity) {
+    $entity_type = 'node';
+    $bundles = ['partita_di_calcio'];
+
+    if ($entity->getEntityTypeId() != $entity_type || !in_array($entity->bundle(), $bundles)) {
+      return;
+    }
+
+    // Create a new node object.
+    $node = Node::create([
+        'type' => 'pagella_partita',
+        'title' => 'My programmatically created node',
+        'field_giocatore' => $entity->field_bianchi[0]->entity,
+        'field_partita' => $entity,
+    ]);
+
+    $fine ='fine';
+    // Save the node.
+    $node->save();
+  }
