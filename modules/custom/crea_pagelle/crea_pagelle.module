@@ -6,14 +6,15 @@ use Drupal\node\Entity\Node;
 
 function crea_pagelle_node_presave(EntityInterface $entity) {
 
-  $entity_type = 'node';
-  $bundles = ['product'];
+    $entity_type = 'node';
+    $bundles = ['partita_di_calcio'];
 
-  $fld_price = 'field_price';
-  if ($entity->getEntityTypeId() != $entity_type || !in_array($entity->bundle(), $bundles)) {
-    return;
-  }
- // $entity->{$fld_price}->setValue(10.75);
+    if ($entity->getEntityTypeId() != $entity_type || !in_array($entity->bundle(), $bundles)) {
+      return;
+    }
+    if ( $entity->field_crea_pagelle->value && !$entity->field_pagelle_create->value){
+        $entity->field_pagelle_create->value=1;
+    }
 
 }
 
@@ -24,16 +25,61 @@ function crea_pagelle_entity_update(EntityInterface $entity) {
     if ($entity->getEntityTypeId() != $entity_type || !in_array($entity->bundle(), $bundles)) {
       return;
     }
+    if ( $entity->field_crea_pagelle->value && !$entity->field_pagelle_create->value){
 
-    // Create a new node object.
-    $node = Node::create([
-        'type' => 'pagella_partita',
-        'title' => 'My programmatically created node',
-        'field_giocatore' => $entity->field_bianchi[0]->entity,
-        'field_partita' => $entity,
-    ]);
+        $bianchi = $entity->field_bianchi->referencedEntities();
+        $neri = $entity->field_neri->referencedEntities();
+        if(is_array($bianchi)){
+            foreach ($bianchi as &$value) {
+                // Create a new node object.
+                $node = Node::create([
+                    'type' => 'pagella_partita',
+                    'title' => 'Pagella del '. date("d-m", strtotime($entity->field_data->value)),
+                    'field_giocatore' => $value,
+                    'field_partita' => $entity,
+                    'uid' => $value,
+                    //'field_pagelle_create' => true,
+                ]);
+                // Save the node.
+                $node->save();
 
-    $fine ='fine';
-    // Save the node.
-    $node->save();
+                $items = \Drupal::entityTypeManager()->getStorage('node')
+                ->loadByProperties(['type' => 'pagelle_del_calciatore',
+                                    'field_giocatore' => $value->uid->value,]);
+
+                //array_push(reset($items)->field_pagelle->referencedEntities(), $node->nid);
+                //$node->field_code_used_by[] = ['target_id' => $user_id];
+                $pagelle_del_calciatore=reset($items);
+                $pagelle_del_calciatore->field_pagelle[] = ['target_id' => $node->id()];
+                $pagelle_del_calciatore->save();
+            }
+        }
+
+        if(is_array($neri)){
+            foreach ($neri as &$value) {
+                // Create a new node object.
+                $node = Node::create([
+                    'type' => 'pagella_partita',
+                    'title' => 'Pagella del '. date("d-m", strtotime($entity->field_data->value)),
+                    'field_giocatore' => $value,
+                    'field_partita' => $entity,
+                    'uid' => $value,
+                    //'field_pagelle_create' => true,
+                ]);
+                // Save the node.
+                $node->save();
+
+                $items = \Drupal::entityTypeManager()->getStorage('node')
+                ->loadByProperties(['type' => 'pagelle_del_calciatore',
+                                    'field_giocatore' => $value->uid->value,]);
+
+                //array_push(reset($items)->field_pagelle->referencedEntities(), $node->nid);
+                //$node->field_code_used_by[] = ['target_id' => $user_id];
+                $pagelle_del_calciatore=reset($items);
+                $pagelle_del_calciatore->field_pagelle[] = ['target_id' => $node->id()];
+                $pagelle_del_calciatore->save();
+            }
+        }
+    }
+
   }
