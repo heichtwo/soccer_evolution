@@ -24,6 +24,7 @@ function crea_pagelle_node_presave(EntityInterface $entity) {
                     'title' => 'Pagella del '. date("d-m", strtotime($entity->field_data->value)),
                     'field_giocatore' => $value,
                     'field_partita' => $entity,
+                    'field_squadra' => 'Bianchi',
                     'uid' => $value,
                     //'field_pagelle_create' => true,
                 ]);
@@ -54,6 +55,8 @@ function crea_pagelle_node_presave(EntityInterface $entity) {
                     $pagelle_del_calciatore->field_pagelle[] = ['target_id' => $node->id()];
                     $pagelle_del_calciatore->save();
                 }
+
+                $entity->field_schede_bianchi[] = ['target_id' => $node->id()];
 
             }
         }
@@ -66,6 +69,7 @@ function crea_pagelle_node_presave(EntityInterface $entity) {
                     'title' => 'Pagella del '. date("d-m", strtotime($entity->field_data->value)),
                     'field_giocatore' => $value,
                     'field_partita' => $entity,
+                    'field_squadra' => 'Neri',
                     'uid' => $value,
                     //'field_pagelle_create' => true,
                 ]);
@@ -96,6 +100,8 @@ function crea_pagelle_node_presave(EntityInterface $entity) {
                     $pagelle_del_calciatore->field_pagelle[] = ['target_id' => $node->id()];
                     $pagelle_del_calciatore->save();
                 }
+
+                $entity->field_schede_neri[] = ['target_id' => $node->id()];
             }
         }
         $entity->field_pagelle_create->value=1;
@@ -103,6 +109,7 @@ function crea_pagelle_node_presave(EntityInterface $entity) {
 
 
 }
+
 
 function crea_pagelle_entity_update(EntityInterface $entity) {
     $entity_type = 'node';
