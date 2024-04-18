@@ -37,3 +37,9 @@ summary.clickable {
   font-weight: bold;
   text-decoration: underline;
 }
+
+summary.clickable-h2 {
+  cursor: pointer;
+  font-weight: bold;
+  text-decoration: underline;
+}

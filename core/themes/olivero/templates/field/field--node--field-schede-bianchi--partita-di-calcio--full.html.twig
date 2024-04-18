@@ -66,19 +66,30 @@
     {% endfor %}
   {% endif %}
 {% else %}
+<details>
+    <summary class="clickable-h2" >
+      {{ label }}
+    </summary>
   <div{{ attributes.addClass(classes) }}>
-    <div{{ title_attributes.addClass(title_classes) }}>{{ label }}</div>
-    {% if multiple %}
-      <div class="field__items">
-    {% endif %}
-    {% for item in items %}
-      <div{{ item.attributes.addClass('field__item') }}>{{ item.content }}</div>
+      <div{{ title_attributes.addClass(title_classes) }}>
 
-     <h2><p>ciaoooooooooo</p></h2>
-
-    {% endfor %}
-    {% if multiple %}
       </div>
-    {% endif %}
+      {% if multiple %}
+        <div class="field__items">
+      {% endif %}
+      {% for item in items %}
+        <details>
+          <summary class="clickable">
+            {{ item.content["#node"].field_giocatore.entity.name.value }}
+          </summary>
+          <div{{ item.attributes.addClass('field__item') }}>
+              {{ item.content }}
+          </div>
+        </details>
+      {% endfor %}
+      {% if multiple %}
+        </details>
+        </div>
+      {% endif %}
   </div>
 {% endif %}
