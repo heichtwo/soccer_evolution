@@ -411,7 +411,39 @@ class CommentForm extends ContentEntityForm {
       $this->messenger()->addError($this->t('Comment: unauthorized comment submitted or comment submitted to a closed post %subject.', ['%subject' => $comment->getSubject()]));
       // Redirect the user to the entity they are commenting on.
     }
-    $form_state->setRedirectUrl($uri);
+    $form_state->setRedirectUrl($this->evalRedirect($uri));
+  }
+
+  private function evalRedirect(Url $uri) {
+    $strUrl= $_SERVER["HTTP_REFERER"];
+    if (str_contains($strUrl, '/node/') && !str_contains($strUrl, '/comment/')) {
+      $pieces = explode("/", $strUrl);
+      $strCalc=end($pieces);
+      if (str_contains($strCalc, '#')) {
+        $temppieces = explode("#", $strCalc );
+        $strCalc=$temppieces[0];
+      }
+      if (str_contains($strUrl, '/edit')) {
+        $strCalc=$pieces[count($pieces)-2];
+      }
+
+      $nodeStorage = \Drupal::entityTypeManager()->getStorage('node');
+      $ids = $nodeStorage->getQuery()
+        ->condition('status', 1)
+        ->condition('type', 'partita_di_calcio') // type = bundle id (machine name)
+        ->condition('nid', $strCalc)
+        //->sort('created', 'ASC') // sorted by time of creation
+        //->pager(15) // limit 15 items
+        ->accessCheck(TRUE) // or FALSE
+        ->execute();
+      //$articles = $nodeStorage->loadMultiple($ids);
+      if (isset($ids)) {
+        $uriRedirect = Url::fromRoute('entity.node.canonical', array('node' => $strCalc));
+        $uriRedirect->setOptions($uri->getOptions());
+        $uri=$uriRedirect;
+      }
+    }
+    return $uri;
   }
 
 }

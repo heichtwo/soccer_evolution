@@ -44,3 +44,14 @@ summary.clickable-h2 {
   text-decoration: underline;
   font-size: x-large;
 }
+
+details.schede-pari {
+  padding: 10px;
+  background-color: #85d6a0;
+  border-radius: 5px;
+}
+details.schede-dispari {
+  padding: 10px;
+  background-color: #e6e6e7be;
+  border-radius: 5px;
+}

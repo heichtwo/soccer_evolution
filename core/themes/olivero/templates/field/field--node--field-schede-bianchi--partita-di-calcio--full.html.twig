@@ -78,7 +78,11 @@
         <div class="field__items">
       {% endif %}
       {% for item in items %}
-        <details>
+      {% if loop.index is divisible by(2) %}
+        <details class="schede-pari">
+      {% else %}
+        <details class="schede-dispari">
+      {% endif %}
           <summary class="clickable">
             {{ item.content["#node"].field_giocatore.entity.name.value }}
           </summary>
